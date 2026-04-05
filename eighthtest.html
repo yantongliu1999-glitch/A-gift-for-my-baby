@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<!-- saved from url=(0052)file://wsl.localhost/Ubuntu/home/liu/eighthtest.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Special Birthday Gift</title>
+<link href="./eighthtest_files/css2" rel="stylesheet">
+<style>
+  /* ====== 基础设置 ====== */
+  body { 
+    margin: 0; display: flex; justify-content: center; align-items: center; 
+    height: 100vh; background-color: #2c3e50; font-family: 'Press Start 2P', cursive; color: white;
+    user-select: none; 
+  }
+
+  /* ====== 游戏小盒子主容器 (800x450) ====== */
+  #game-window { 
+    position: relative; 
+    width: 800px; height: 450px; 
+    background-color: #111; overflow: hidden; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+    border: 4px solid #5d4037; border-radius: 8px; 
+    image-rendering: pixelated; 
+  }
+
+  /* ====== 场景切换通用类 ====== */
+  .stage { 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+    opacity: 0; pointer-events: none; transition: opacity 1.5s ease-in-out;
+  }
+  .stage.active { opacity: 1; pointer-events: auto; }
+
+  /* ====== 按钮样式 (居中排版) ====== */
+  .pixel-btn {
+    font-family: 'Press Start 2P', cursive; background-color: #fdf2e9; color: #52372c; 
+    border: 8px solid #52372c; padding: 10px 20px; cursor: pointer; font-size: 14px;
+    transition: transform 0.1s; text-shadow: none; z-index: 30;
+    box-shadow: 6px 6px 0 #000;
+    /* 按钮绝对居中在底部 */
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+  }
+  .pixel-btn:active { transform: translateX(-50%) scale(0.95); box-shadow: 4px 4px 0 #000; }
+
+  /* ====== 第一幕：农场 ====== */
+  #stage1 {
+    background-image: url('https://github.com/user-attachments/assets/be5801a7-14eb-43bd-8748-fcdd8160bafd');
+    background-size: 100% 100%; 
+  }
+  #title-text { 
+    position: absolute; top: 30px; width: 100%; text-align: center;
+    font-size: 18px; color: white; text-shadow: 3px 3px #000; z-index: 20;
+  }
+  
+  /* 小狗动画 (64x64) */
+  #dog { 
+    position: absolute; z-index: 10; width: 64px; height: 64px; 
+    background-image: url('https://github.com/user-attachments/assets/14bba99c-77bc-48c6-8977-ccad2d79ba9a'); 
+    background-size: 256px 64px; background-repeat: no-repeat;
+    animation: runLegs 0.6s steps(4) infinite; transition: top 2.5s linear, left 2.5s linear; 
+  }
+  @keyframes runLegs { from { background-position: 0 0; } to { background-position: -256px 0; } }
+
+  /* ====== 第二幕：吹蜡烛 (修复为满屏背景图) ====== */
+  #stage2 { background-color: #000; }
+  #cake-bg { 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+    object-fit: cover; z-index: 1; transition: filter 1s; 
+  }
+  #wish-text { 
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    opacity: 0; font-size: 24px; text-shadow: 3px 3px #000; 
+    transition: opacity 2s ease; z-index: 20; color: #f1c40f; 
+    width: 100%; text-align: center; pointer-events: none;
+  }
+  
+  /* ====== 第三幕：祝福转场 ====== */
+  #stage3 { background-color: #000; }
+  #blessing-text { 
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 100%; text-align: center; opacity: 0; font-size: 20px; line-height: 2; 
+    transition: opacity 1.5s ease; z-index: 20; color: white; text-shadow: 2px 2px #000;
+  }
+  #confetti-canvas { 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+    z-index: 5; pointer-events: none; 
+  }
+
+  /* ====== 第四幕：扭蛋机 (修复为满屏背景图) ====== */
+  #stage4 { background-color: #000; }
+  #gacha-bg { 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+    object-fit: cover; z-index: 1; 
+  }
+  /* 摇晃动画应用于整个房间 */
+  .shake { animation: shake 0.5s infinite; } 
+  @keyframes shake { 0%, 100% { transform: translate(0,0); } 25% { transform: translate(-4px, -4px); } 50% { transform: translate(4px, 4px); } 75% { transform: translate(-4px, 4px); } }
+  
+  /* ====== 模态框 ====== */
+  #modal { 
+    display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.8); z-index: 100; flex-direction: column; justify-content: center; align-items: center; 
+    text-align: center; padding: 0 40px; box-sizing: border-box;
+  }
+  #modal-content { 
+    background: #fdf2e9; color: #52372c; padding: 30px; 
+    border: 8px solid #52372c; line-height: 1.8; box-shadow: 8px 8px 0 #000;
+  }
+</style>
+</head>
+<body>
+
+<audio id="audio-bgm" loop="" src=""></audio>
+<audio id="audio-switch" src=""></audio>
+<audio id="audio-lighter" src=""></audio>
+
+<div id="game-window">
+
+  <div id="stage1" class="stage">
+    <div id="title-text">a gift for my baby</div>
+    <div id="dog" style="left: 590px; top: 325px; transform: scaleX(1);"></div>
+    <button class="pixel-btn" id="btn-enter">enter our lovely home</button>
+  </div>
+
+  <div id="stage2" class="stage">
+    <img id="cake-bg" src="./eighthtest_files/3e77721b-990c-4f26-9d7b-12c9da2c8a91" alt="cake room" style="filter: brightness(1);">
+    
+    <div id="wish-text" style="opacity: 1;">make a wish...</div>
+    <button class="pixel-btn" id="btn-lights" style="display: none;">Turn off lights</button>
+    <button class="pixel-btn" id="btn-lighter" style="display: none; background-color: rgb(192, 57, 43); border-color: rgb(146, 43, 33); color: white;">Hold to light</button>
+  </div>
+
+  <div id="stage3" class="stage">
+    <canvas id="confetti-canvas" width="800" height="450"></canvas>
+    <div id="blessing-text" style="opacity: 1;">now it's time for<br><br>the birthday gift !</div>
+  </div>
+
+  <div id="stage4" class="stage active">
+    <img id="gacha-bg" src="./eighthtest_files/bac3b50c-e2e8-4b4d-a464-12c1d902a66f" alt="gacha room" class="">
+    
+    <button class="pixel-btn" id="btn-gacha">Gacha-pon!</button>
+  </div>
+
+  <div id="modal" style="display: none;">
+    <div id="modal-content" style="border-color: rgb(39, 174, 96); background: rgb(46, 204, 113);">
+      <h3 id="gacha-result" style="margin-top:0; font-size: 16px;">A Bouquet of Flowers 💐</h3>
+      <p id="gacha-desc" style="font-size: 12px; color: #333;">Wait for me to buy them!</p>
+      <button class="pixel-btn" id="btn-close-modal" style="position:relative; transform:none; left:auto; bottom:auto; margin-top: 20px; font-size: 10px;">Close</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ================= 小狗精密寻路 (64x64放大版) =================
+  const dog = document.getElementById('dog');
+  const pathPoints = [ 
+    { x: 460, y: 280 }, { x: 500, y: 295 }, { x: 540, y: 310 }, 
+    { x: 590, y: 325 }, { x: 420, y: 300 }  
+  ];
+  let currentIndex = 0; let currentX = pathPoints[currentIndex].x; 
+  dog.style.left = currentX + 'px'; dog.style.top = pathPoints[currentIndex].y + 'px';
+
+  function moveDog() {
+    let nextIndex; do { nextIndex = Math.floor(Math.random() * pathPoints.length); } while (nextIndex === currentIndex);
+    const target = pathPoints[nextIndex];
+    if (target.x < currentX) { dog.style.transform = 'scaleX(-1)'; } else { dog.style.transform = 'scaleX(1)'; }
+    dog.style.left = target.x + 'px'; dog.style.top = target.y + 'px';
+    currentX = target.x; currentIndex = nextIndex;
+    setTimeout(moveDog, Math.floor(Math.random() * 2000) + 2000);
+  }
+  setTimeout(moveDog, 500);
+
+  // ================= 舞台转场控制 =================
+  function switchStage(hideId, showId) {
+    document.getElementById(hideId).classList.remove('active');
+    setTimeout(() => { document.getElementById(showId).classList.add('active'); }, 1500);
+  }
+
+  // ================= Stage 1 交互 =================
+  document.getElementById('btn-enter').addEventListener('click', () => {
+    // document.getElementById('audio-bgm').play().catch(()=>{}); // BGM启动
+    switchStage('stage1', 'stage2');
+  });
+
+  // ================= Stage 2 交互 =================
+  const btnLights = document.getElementById('btn-lights');
+  const btnLighter = document.getElementById('btn-lighter');
+  const cakeBg = document.getElementById('cake-bg');
+  const wishText = document.getElementById('wish-text');
+  let holdTimer;
+
+  btnLights.addEventListener('click', () => {
+    document.getElementById('audio-switch').play().catch(()=>{});
+    cakeBg.style.filter = 'brightness(0.3)'; // 房间变暗
+    btnLights.style.display = 'none';
+    btnLighter.style.display = 'block';
+  });
+
+  function startLighting() {
+    document.getElementById('audio-lighter').play().catch(()=>{});
+    holdTimer = setTimeout(() => {
+      btnLighter.style.display = 'none';
+      cakeBg.style.filter = 'brightness(1)';
+      // 换成点亮蜡烛的房间图
+      cakeBg.src = 'https://github.com/user-attachments/assets/3e77721b-990c-4f26-9d7b-12c9da2c8a91'; 
+      wishText.style.opacity = '1';
+      
+      setTimeout(() => { switchStage('stage2', 'stage3'); playStage3(); }, 3000);
+    }, 1500);
+  }
+  function cancelLighting() { clearTimeout(holdTimer); }
+
+  btnLighter.addEventListener('mousedown', startLighting);
+  btnLighter.addEventListener('mouseup', cancelLighting);
+  btnLighter.addEventListener('mouseleave', cancelLighting);
+  btnLighter.addEventListener('touchstart', startLighting);
+  btnLighter.addEventListener('touchend', cancelLighting);
+
+  // ================= Stage 3 交互 =================
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let confettiActive = false;
+
+  function initConfetti() {
+    canvas.width = 800; canvas.height = 450; // 锁定内部画布大小
+    particles = [];
+    for (let i = 0; i < 150; i++) {
+        particles.push({
+            x: Math.random() * 800, y: Math.random() * 450 - 450,
+            size: Math.random() * 6 + 4, speed: Math.random() * 3 + 2,
+            color: `hsl(${Math.random() * 360}, 80%, 60%)`, angle: Math.random() * 6
+        });
+    }
+  }
+
+  function drawConfetti() {
+    if (!confettiActive) return;
+    ctx.clearRect(0, 0, 800, 450);
+    particles.forEach(p => {
+        ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, p.size, p.size);
+        p.y += p.speed; p.x += Math.sin(p.angle) * 2;
+        if (p.y > 450) p.y = -20;
+    });
+    requestAnimationFrame(drawConfetti);
+  }
+
+  const blessingText = document.getElementById('blessing-text');
+  function playStage3() {
+    setTimeout(() => { 
+        blessingText.style.opacity = '1'; 
+        confettiActive = true; initConfetti(); drawConfetti();
+    }, 1000); 
+    setTimeout(() => { 
+      blessingText.style.opacity = '0'; 
+      setTimeout(() => {
+        blessingText.innerHTML = "now it's time for<br><br>the birthday gift !"; 
+        blessingText.style.opacity = '1';
+        setTimeout(() => { confettiActive = false; switchStage('stage3', 'stage4'); }, 3000); 
+      }, 1500);
+    }, 4000);
+  }
+
+  // ================= Stage 4 交互 =================
+  const btnGacha = document.getElementById('btn-gacha');
+  const gachaBg = document.getElementById('gacha-bg');
+  const modal = document.getElementById('modal');
+  const resultTitle = document.getElementById('gacha-result');
+  const resultDesc = document.getElementById('gacha-desc');
+  
+  const prizes = [
+    { title: "No Anger Voucher 🎫", desc: "You will never get angry for a whole day" },
+    { title: "Specify a Meal 🍲", desc: "Your wish is my command" },
+    { title: "A Bouquet of Flowers 💐", desc: "Wait for me to buy them!" }
+  ];
+
+  btnGacha.addEventListener('click', () => {
+    btnGacha.disabled = true; gachaBg.classList.add('shake'); // 摇晃整个扭蛋房
+    setTimeout(() => {
+      gachaBg.classList.remove('shake');
+      if (Math.random() < 0.8) {
+        const prize = prizes[Math.floor(Math.random() * prizes.length)];
+        resultTitle.innerText = prize.title; resultDesc.innerText = prize.desc;
+        document.getElementById('modal-content').style.borderColor = '#27ae60';
+        document.getElementById('modal-content').style.background = '#2ecc71';
+      } else {
+        resultTitle.innerText = "Empty Gacha!"; resultDesc.innerText = "Oh no! Better luck next time!";
+        document.getElementById('modal-content').style.borderColor = '#c0392b';
+        document.getElementById('modal-content').style.background = '#e74c3c';
+      }
+      modal.style.display = 'flex'; btnGacha.disabled = false;
+    }, 1200); 
+  });
+
+  document.getElementById('btn-close-modal').addEventListener('click', () => { modal.style.display = 'none'; });
+</script>
+
+
+</body></html>
