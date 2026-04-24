@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A Special Birthday Gift</title>
+<title>A Gift For My Baby</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
   /* ====== 基础设置 ====== */
@@ -13,30 +13,27 @@
     user-select: none; 
   }
 
-  /* ====== 游戏小盒子主容器 (800x450) ====== */
+  /* ====== 游戏小盒子主容器 ====== */
   #game-window { 
-    position: relative; 
-    width: 800px; height: 450px; 
+    position: relative; width: 800px; height: 450px; 
     background-color: #111; overflow: hidden; 
     box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
     border: 4px solid #5d4037; border-radius: 8px; 
     image-rendering: pixelated; 
   }
 
-  /* ====== 场景切换通用类 ====== */
+  /* ====== 场景切换 ====== */
   .stage { 
     position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
     opacity: 0; pointer-events: none; transition: opacity 1.5s ease-in-out;
   }
   .stage.active { opacity: 1; pointer-events: auto; }
 
-  /* ====== 按钮样式 (居中排版) ====== */
+  /* ====== 按钮样式 ====== */
   .pixel-btn {
     font-family: 'Press Start 2P', cursive; background-color: #fdf2e9; color: #52372c; 
     border: 8px solid #52372c; padding: 10px 20px; cursor: pointer; font-size: 14px;
-    transition: transform 0.1s; text-shadow: none; z-index: 30;
-    box-shadow: 6px 6px 0 #000;
-    /* 按钮绝对居中在底部 */
+    transition: transform 0.1s; text-shadow: none; z-index: 30; box-shadow: 6px 6px 0 #000;
     position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
   }
   .pixel-btn:active { transform: translateX(-50%) scale(0.95); box-shadow: 4px 4px 0 #000; }
@@ -51,7 +48,7 @@
     font-size: 18px; color: white; text-shadow: 3px 3px #000; z-index: 20;
   }
   
-  /* 小狗动画 (64x64) */
+  /* 小狗动画 */
   #dog { 
     position: absolute; z-index: 10; width: 64px; height: 64px; 
     background-image: url('https://github.com/user-attachments/assets/14bba99c-77bc-48c6-8977-ccad2d79ba9a'); 
@@ -60,11 +57,11 @@
   }
   @keyframes runLegs { from { background-position: 0 0; } to { background-position: -256px 0; } }
 
-  /* ====== 第二幕：吹蜡烛 (修复为满屏背景图) ====== */
+  /* ====== 第二幕：吹蜡烛 ====== */
   #stage2 { background-color: #000; }
   #cake-bg { 
     position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-    object-fit: cover; z-index: 1; transition: filter 1s; 
+    object-fit: cover; z-index: 1; transition: filter 1s ease-in-out; 
   }
   #wish-text { 
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -80,18 +77,11 @@
     width: 100%; text-align: center; opacity: 0; font-size: 20px; line-height: 2; 
     transition: opacity 1.5s ease; z-index: 20; color: white; text-shadow: 2px 2px #000;
   }
-  #confetti-canvas { 
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-    z-index: 5; pointer-events: none; 
-  }
+  #confetti-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
 
-  /* ====== 第四幕：扭蛋机 (修复为满屏背景图) ====== */
+  /* ====== 第四幕：扭蛋机 ====== */
   #stage4 { background-color: #000; }
-  #gacha-bg { 
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-    object-fit: cover; z-index: 1; 
-  }
-  /* 摇晃动画应用于整个房间 */
+  #gacha-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
   .shake { animation: shake 0.5s infinite; } 
   @keyframes shake { 0%, 100% { transform: translate(0,0); } 25% { transform: translate(-4px, -4px); } 50% { transform: translate(4px, 4px); } 75% { transform: translate(-4px, 4px); } }
   
@@ -123,10 +113,9 @@
 
   <div id="stage2" class="stage">
     <img id="cake-bg" src="https://github.com/user-attachments/assets/0602040d-b202-4c55-aed8-af9f0e6102bf" alt="cake room">
-    
     <div id="wish-text">make a wish...</div>
     <button class="pixel-btn" id="btn-lights">Turn off lights</button>
-    <button class="pixel-btn" id="btn-lighter" style="display:none; background-color: #c0392b; border-color: #922b21; color: white;">Hold to light</button>
+    <button class="pixel-btn" id="btn-lighter" style="display:none; background-color: #c0392b; border-color: #922b21; color: white;">Light the candle!</button>
   </div>
 
   <div id="stage3" class="stage">
@@ -136,7 +125,6 @@
 
   <div id="stage4" class="stage">
     <img id="gacha-bg" src="https://github.com/user-attachments/assets/bac3b50c-e2e8-4b4d-a464-12c1d902a66f" alt="gacha room">
-    
     <button class="pixel-btn" id="btn-gacha">Gacha-pon!</button>
   </div>
 
@@ -151,7 +139,13 @@
 </div>
 
 <script>
-  // ================= 小狗精密寻路 (64x64放大版) =================
+  // ================= 图像预加载引擎 =================
+  const preloadedLitCake = new Image();
+  // ⚠️⚠️⚠️ 极其重要：请把下面这个链接，换成你新生成的、干净的【点燃蛋糕】图片！
+  // 这个旧链接就是那个农场和厨房画混在一起的“罪魁祸首”！
+  preloadedLitCake.src = 'https://github.com/user-attachments/assets/3e77721b-990c-4f26-9d7b-12c9da2c8a91';
+
+  // ================= 小狗精密寻路 =================
   const dog = document.getElementById('dog');
   const pathPoints = [ 
     { x: 460, y: 280 }, { x: 500, y: 295 }, { x: 540, y: 310 }, 
@@ -170,129 +164,48 @@
   }
   setTimeout(moveDog, 500);
 
-  // ================= 舞台转场控制 =================
+  // ================= 转场控制 =================
   function switchStage(hideId, showId) {
     document.getElementById(hideId).classList.remove('active');
     setTimeout(() => { document.getElementById(showId).classList.add('active'); }, 1500);
   }
 
-  // ================= Stage 1 交互 =================
   document.getElementById('btn-enter').addEventListener('click', () => {
-    // document.getElementById('audio-bgm').play().catch(()=>{}); // BGM启动
     switchStage('stage1', 'stage2');
   });
 
-  // ================= Stage 2 交互 =================
+  // ================= 第二幕：点蜡烛 =================
   const btnLights = document.getElementById('btn-lights');
   const btnLighter = document.getElementById('btn-lighter');
   const cakeBg = document.getElementById('cake-bg');
   const wishText = document.getElementById('wish-text');
-  let holdTimer;
 
   btnLights.addEventListener('click', () => {
     document.getElementById('audio-switch').play().catch(()=>{});
-    cakeBg.style.filter = 'brightness(0.3)'; // 房间变暗
+    cakeBg.style.filter = 'brightness(0.3)'; 
     btnLights.style.display = 'none';
     btnLighter.style.display = 'block';
   });
 
-  function startLighting() {
+  // 改为最稳妥的“点击”事件，绝不失效
+  btnLighter.addEventListener('click', () => {
     document.getElementById('audio-lighter').play().catch(()=>{});
-    holdTimer = setTimeout(() => {
-      btnLighter.style.display = 'none';
-      cakeBg.style.filter = 'brightness(1)';
-      // 换成点亮蜡烛的房间图
-      cakeBg.src = 'https://github.com/user-attachments/assets/3e77721b-990c-4f26-9d7b-12c9da2c8a91'; 
+    btnLighter.style.display = 'none'; // 按钮消失
+
+    // 延迟 0.8 秒（模拟点打火机的感觉），然后无缝点亮！
+    setTimeout(() => {
+      // 使用预加载好的干净图片，0延迟
+      cakeBg.src = preloadedLitCake.src; 
+      cakeBg.style.filter = 'brightness(1)'; // 恢复亮度
       wishText.style.opacity = '1';
       
+      // 3秒后进入第三幕
       setTimeout(() => { switchStage('stage2', 'stage3'); playStage3(); }, 3000);
-    }, 1500);
-  }
-  function cancelLighting() { clearTimeout(holdTimer); }
+    }, 800);
+  });
 
-  btnLighter.addEventListener('mousedown', startLighting);
-  btnLighter.addEventListener('mouseup', cancelLighting);
-  btnLighter.addEventListener('mouseleave', cancelLighting);
-  btnLighter.addEventListener('touchstart', startLighting);
-  btnLighter.addEventListener('touchend', cancelLighting);
-
-  // ================= Stage 3 交互 =================
+  // ================= 第三幕：礼花 =================
   const canvas = document.getElementById('confetti-canvas');
   const ctx = canvas.getContext('2d');
   let particles = [];
   let confettiActive = false;
-
-  function initConfetti() {
-    canvas.width = 800; canvas.height = 450; // 锁定内部画布大小
-    particles = [];
-    for (let i = 0; i < 150; i++) {
-        particles.push({
-            x: Math.random() * 800, y: Math.random() * 450 - 450,
-            size: Math.random() * 6 + 4, speed: Math.random() * 3 + 2,
-            color: `hsl(${Math.random() * 360}, 80%, 60%)`, angle: Math.random() * 6
-        });
-    }
-  }
-
-  function drawConfetti() {
-    if (!confettiActive) return;
-    ctx.clearRect(0, 0, 800, 450);
-    particles.forEach(p => {
-        ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, p.size, p.size);
-        p.y += p.speed; p.x += Math.sin(p.angle) * 2;
-        if (p.y > 450) p.y = -20;
-    });
-    requestAnimationFrame(drawConfetti);
-  }
-
-  const blessingText = document.getElementById('blessing-text');
-  function playStage3() {
-    setTimeout(() => { 
-        blessingText.style.opacity = '1'; 
-        confettiActive = true; initConfetti(); drawConfetti();
-    }, 1000); 
-    setTimeout(() => { 
-      blessingText.style.opacity = '0'; 
-      setTimeout(() => {
-        blessingText.innerHTML = "now it's time for<br><br>the birthday gift !"; 
-        blessingText.style.opacity = '1';
-        setTimeout(() => { confettiActive = false; switchStage('stage3', 'stage4'); }, 3000); 
-      }, 1500);
-    }, 4000);
-  }
-
-  // ================= Stage 4 交互 =================
-  const btnGacha = document.getElementById('btn-gacha');
-  const gachaBg = document.getElementById('gacha-bg');
-  const modal = document.getElementById('modal');
-  const resultTitle = document.getElementById('gacha-result');
-  const resultDesc = document.getElementById('gacha-desc');
-  
-  const prizes = [
-    { title: "No Anger Voucher 🎫", desc: "You will never get angry for a whole day" },
-    { title: "Specify a Meal 🍲", desc: "Your wish is my command" },
-    { title: "A Bouquet of Flowers 💐", desc: "Wait for me to buy them!" }
-  ];
-
-  btnGacha.addEventListener('click', () => {
-    btnGacha.disabled = true; gachaBg.classList.add('shake'); // 摇晃整个扭蛋房
-    setTimeout(() => {
-      gachaBg.classList.remove('shake');
-      if (Math.random() < 0.8) {
-        const prize = prizes[Math.floor(Math.random() * prizes.length)];
-        resultTitle.innerText = prize.title; resultDesc.innerText = prize.desc;
-        document.getElementById('modal-content').style.borderColor = '#27ae60';
-        document.getElementById('modal-content').style.background = '#2ecc71';
-      } else {
-        resultTitle.innerText = "Empty Gacha!"; resultDesc.innerText = "Oh no! Better luck next time!";
-        document.getElementById('modal-content').style.borderColor = '#c0392b';
-        document.getElementById('modal-content').style.background = '#e74c3c';
-      }
-      modal.style.display = 'flex'; btnGacha.disabled = false;
-    }, 1200); 
-  });
-
-  document.getElementById('btn-close-modal').addEventListener('click', () => { modal.style.display = 'none'; });
-</script>
-</body>
-</html>
